@@ -54,12 +54,14 @@ window.onload = function() {
     let isReceivingMouseInput = false;
 
     const renderer = new THREE.WebGLRenderer();
+    //renderer.shadowMap.enabled = true;
 
     renderer.setSize(window.innerWidth, window.innerHeight);
 
     document.body.appendChild(renderer.domElement);
 
     const light = new THREE.DirectionalLight( 0xffffff, 1 );
+    light.castShadow = true;
 
     const targetObject = new THREE.Object3D();
 
@@ -246,7 +248,7 @@ window.onload = function() {
             {
                 let currVert = verts[vert];
                 currVert.force.x = 0.;
-                currVert.force.y = currVert.mass * -1;
+                currVert.force.y = currVert.mass * -.1;
                 currVert.force.z = 0.;
             }
             this.HandleCollision();
@@ -307,7 +309,7 @@ window.onload = function() {
 
         this.addPressureForce = function() {
             let volume = getVolume(procGeometry);
-            let pressure = .00025 * nRT / volume;
+            let pressure = .00005 * nRT / volume;
 
             for (var face in vertFaceIndex)
             {
@@ -337,7 +339,7 @@ window.onload = function() {
         }
     }
 
-    const sphereGeom = new THREE.SphereGeometry( 2, 32, 16);
+    const sphereGeom = new THREE.TorusGeometry(2, 1, 32, 32);
     const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
     const sphere =  new THREE.Mesh( sphereGeom, material );
     
@@ -357,7 +359,7 @@ window.onload = function() {
 
         
 
-        vertArray[i] = new Vertex(readingArray[parseInt(baseIndex)], readingArray[baseIndex + 1], readingArray[baseIndex + 2], 10., new THREE.Vector3(0., 0., 0.), new THREE.Vector3(0., 0., 0.));
+        vertArray[i] = new Vertex(readingArray[parseInt(baseIndex)], readingArray[baseIndex + 1] + 5., readingArray[baseIndex + 2], 10., new THREE.Vector3(0., 0., 0.), new THREE.Vector3(0., 0., 0.));
         
         //currIndex++;
 
@@ -389,7 +391,7 @@ window.onload = function() {
     //Set for all
 
     const pointMass = 10.;
-    /*
+    
     let Body = new SoftBody(
         [
             new Vertex(0., 3, 0., pointMass, new THREE.Vector3(0., 0., 0.), new THREE.Vector3(0., 0., 0.)), 
@@ -422,8 +424,8 @@ window.onload = function() {
         ]);
         
     //
-*/
-    let Body = new SoftBody(vertArray, faceArray, []);
+
+    //let Body = new SoftBody(vertArray, faceArray, []);
     Body.generateEdgeData();
     Body.convertToThreeMesh();
     
@@ -477,6 +479,14 @@ window.onload = function() {
 
 
     //scene.add( procMesh );
+
+    const groundGeometry = new THREE.BoxGeometry(10., 1., 10.);
+    const groundMaterial = new THREE.MeshLambertMaterial( {color: 0xffff00 } );
+    const cube = new THREE.Mesh(groundGeometry, groundMaterial);
+
+    cube.position.y = -.5;
+
+    scene.add( cube );
 
     function animate() {
 
@@ -533,11 +543,3 @@ window.onload = function() {
 
     animate();
 }
-
-
-
-
-
-
-
-
